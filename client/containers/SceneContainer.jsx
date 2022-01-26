@@ -14,7 +14,7 @@ const SceneContainer = props => {
             console.log('dragStart', event);
         })
         pointerDragBehavior.onDragObservable.add((event) => {
-            console.log('drag', event);
+            // console.log('drag', event);
         })
         pointerDragBehavior.onDragEndObservable.add((event) => {
             console.log('dragEnd', event);
@@ -47,6 +47,24 @@ const SceneContainer = props => {
         SceneLoader.ImportMesh('', 'models/', 'bear.obj', scene, (meshes) => {
             meshes.forEach( (mesh) => {
                 // mesh.position = new Vector3(-2, 0, -2);
+                mesh.scaling = new Vector3(2, 2, 2);
+            })
+            const newMesh = Mesh.MergeMeshes(meshes);
+            attachDragBehavior(newMesh);
+        })
+
+        SceneLoader.ImportMesh('', 'models/', 'loungeDesignChair.obj', scene, (meshes) => {
+            meshes.forEach( (mesh) => {
+                mesh.position = new Vector3(-2, 2, 0);
+                mesh.scaling = new Vector3(2, 2, 2);
+            })
+            const newMesh = Mesh.MergeMeshes(meshes);
+            attachDragBehavior(newMesh);
+        })
+
+        SceneLoader.ImportMesh('', 'models/', 'tableGlass.obj', scene, (meshes) => {
+            meshes.forEach( (mesh) => {
+                mesh.position = new Vector3(-2, 0, -2);
                 mesh.scaling = new Vector3(2, 2, 2);
             })
             const newMesh = Mesh.MergeMeshes(meshes);
@@ -152,20 +170,20 @@ const SceneContainer = props => {
             if (key.code === 'KeyT') {
                 const serializedScene = SceneSerializer.Serialize(scene);
                 const strScene = JSON.stringify(serializedScene);
-                console.log(strScene);
             }
         })
     }
 
     function onRender(scene) {
-
-        // if (box !== undefined) {
-        //     let deltaTimeInMillis = scene.getEngine().getDeltaTime();
-
-        //     const rpm = 5;
-        //     box.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
-        // }
+        // console.log('onRender');
     }
+
+    // function save(scene) {
+        // const serializedScene = SceneSerializer.Serialize(scene);
+        // const strScene = JSON.stringify(serializedScene);
+        // console.log(strScene);
+        // console.log(scene);
+    // }
 
     return (
         <div>

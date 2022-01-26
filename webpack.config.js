@@ -5,11 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: ['./client/index.js'],
+    entry: ['babel-polyfill', './client/index.js'],
     devServer: {
         static: {
             directory: path.resolve(__dirname, 'client'),
             publicPath: '/'
+        },
+        proxy: {
+            '/api': 'http://localhost:3000'
         },
     },
     output: {
