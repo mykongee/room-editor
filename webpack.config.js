@@ -11,8 +11,13 @@ module.exports = {
             directory: path.resolve(__dirname, 'client'),
             publicPath: '/'
         },
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization"
+        },
         proxy: {
-            '/api': 'http://localhost:3000'
+            '/api': 'http://localhost:3000',
         },
     },
     output: {

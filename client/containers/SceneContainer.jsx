@@ -6,7 +6,7 @@ import '@babylonjs/loaders/OBJ';
 
 const SceneContainer = props => {
     let box;
-
+    let logo;
     
     function attachDragBehavior(mesh) {
         const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
@@ -71,6 +71,21 @@ const SceneContainer = props => {
             attachDragBehavior(newMesh);
         })
 
+        SceneLoader.ImportMesh('', 'models/', 'codesmith-logo.obj', scene, (meshes) => {
+            const woodMaterial = new StandardMaterial('woodMaterial', scene);
+            // woodMaterial.diffuseTexture = new Texture('./wood_grain.jpg', scene);
+            woodMaterial.diffuseColor = new Color3(0.08, 0.20, 0.5);
+            // woodMaterial.specularColor = new Color3.Black();
+            meshes.forEach( (mesh) => {
+                mesh.position = new Vector3(5, 2, 3);
+                mesh.scaling = new Vector3(0.2, 0.2, 0.2);
+                mesh.rotation = new Vector3(0, 5, 0);
+                mesh.material = woodMaterial;
+            });
+            newMesh = Mesh.MergeMeshes(meshes);
+            // attachDragBehavior(logo);
+        })
+
         // SceneLoader.ImportMesh('', 'models/', 'floorFull.obj', scene, (meshes) => {
         //     console.log('ImportMesh callback');
         //     meshes.forEach( (mesh) => {
@@ -102,9 +117,9 @@ const SceneContainer = props => {
         const light = new HemisphericLight('light', new Vector3(0, 5, 2), scene);
         light.intensity = 0.8;
 
-        const woodMaterial = new StandardMaterial('woodMaterial', scene);
-        woodMaterial.diffuseTexture = new Texture('./wood_grain.jpg', scene);
-        woodMaterial.specularColor = new Color3.Black();
+        // const woodMaterial = new StandardMaterial('woodMaterial', scene);
+        // woodMaterial.diffuseTexture = new Texture('./wood_grain.jpg', scene);
+        // woodMaterial.specularColor = new Color3.Black();
         box = MeshBuilder.CreateBox('box', { size: 2 }, scene);
         box.position.y = 3;
         // box.scaling = new Vector3(0.6, 0.3, 0.8);
@@ -118,15 +133,16 @@ const SceneContainer = props => {
         // const ground = MeshBuilder.CreateGround('ground', { width: groundSize, height: groundSize }, scene);
         // ground.material = woodMaterial;
         
-        const tile = {
-            w: 8,
-            h: 8,
-        }
+        
         // create tiled ground, create materials
         // create multimaterial and push each material into submaterials array
         // set multimaterial as material for tiledground
         // set submeshes property of tiledground to an empty array
         // create and set values for these variables
+        const tile = {
+            w: 8,
+            h: 8,
+        }
         const ground = MeshBuilder.CreateTiledGround('ground', {xmin: -5, zmin: -5, xmax: 5, zmax: 5, subdivisions: tile}, scene);
         
         const verticesCount = ground.getTotalVertices();
@@ -163,6 +179,8 @@ const SceneContainer = props => {
                 });
                 // console.log(pickResult.pickedMesh.id);
             }
+
+            // scene.getEngine().stopRenderLoop();
         })
 
         // serialize scene
@@ -176,6 +194,12 @@ const SceneContainer = props => {
 
     function onRender(scene) {
         // console.log('onRender');
+        // if (logo) {
+        //     let deltaTime = scene.getEngine().getDeltaTime();
+
+        //     const rpm = 2;
+        //     logo.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTime / 100);
+        // }
     }
 
     // function save(scene) {

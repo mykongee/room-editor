@@ -7,7 +7,7 @@ const SceneComponent = props => {
     const saveButton = useRef(null);
     const { antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady, ...rest } = props;   
     // let [sceneState, setSceneState] = useState(null); 
-    const [isFetching, setIsFetching] = useState(false);
+    // const [isFetching, setIsFetching] = useState(false);
     let scene;
     
     // useCallback( (call, scene) => {
@@ -19,21 +19,47 @@ const SceneComponent = props => {
     //     .catch(err => console.log(err))
     // }, [isFetching])
 
+    // for POST body, serialize scene
     const fetchData = async () => {
-        console.log('is fetching')
+        console.log('is fetching');
         try {
-            const response = await fetch('http://localhost:3000/api', { method: 'GET' });
+            const response = await fetch('http://localhost:3000/api',
+             { method: 'GET' }
+            );
             const res = await response.text();
             console.log(res);            
         } catch (err) {
             console.log(err);
         }
-        // fetch('http://localhost:3000/api', {
-        //     method: "GET",
-        // })
-        // .then(res => res.json())
-        // .then(data => console.log(data))
-        // .catch(err => console.log(err))
+    }
+
+    function save(scene) {
+        const serializedScene = SceneSerializer.Serialize(scene);
+        const strScene = JSON.stringify(serializedScene);
+        // console.log(strScene);
+        return strScene;
+    }
+
+    const postData = async () => {
+        console.log('is posting');
+        try {
+            const serializedData = save(scene);
+            console.log(serializedData);
+            const request = await fetch('http://localhost:3000/api',
+                {   method: 'POST',
+                    headers: {
+                    "Content-Type": "application/json",
+                    // "Access-Control-Allow-Origin": "*",
+                    // "Access-Control-Allow-Credentials": "true"
+                    },
+                    mode: 'cors',
+                    body: serializedData
+                });
+            console.log('response: ', request);
+            const res = await request.text();
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     useEffect( ()=> {
@@ -54,12 +80,6 @@ const SceneComponent = props => {
                 }
                 scene.render();
             });
-
-            // function save(scene) {
-            //     const serializedScene = SceneSerializer.Serialize(scene);
-            //     const strScene = JSON.stringify(serializedScene);
-            //     console.log(strScene);
-            // }
 
             const resize = () => {
                 scene.getEngine().resize();
@@ -92,11 +112,12 @@ const SceneComponent = props => {
         if (saveButton.current) {
             console.log('savebutton useeffect');
         };
-        saveButton.current.addEventListener('pointerdown', fetchData);
+        saveButton.current.addEventListener('pointerdown', postData);
+        // saveButton.current.addEventListener('pointerdown', serialize);
         // add event listener to ping backend
 
         return () => {
-            saveButton.current.removeEventListener('pointerdown', fetchData);
+            saveButton.current.removeEventListener('pointerdown', postData);
         }
     }, [saveButton]);
 
