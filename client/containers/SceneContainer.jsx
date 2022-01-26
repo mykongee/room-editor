@@ -1,5 +1,5 @@
 import React from 'react';
-import { FreeCamera, SubMesh, MultiMaterial, Texture, SceneLoader, TargetCamera, Vector3, HemisphericLight, StandardMaterial, MeshBuilder, Camera, CameraInputTypes, UniversalCamera, Color3, PointerDragBehavior } from '@babylonjs/core';
+import { FreeCamera, SubMesh, MultiMaterial, Texture, SceneLoader, TargetCamera, Vector3, HemisphericLight, StandardMaterial, MeshBuilder, Camera, CameraInputTypes, UniversalCamera, Color3, PointerDragBehavior, Mesh, SceneSerializer } from '@babylonjs/core';
 import SceneComponent from '../components/SceneComponent.jsx';
 import 'babylonjs';
 import '@babylonjs/loaders/OBJ';
@@ -7,6 +7,7 @@ import '@babylonjs/loaders/OBJ';
 const SceneContainer = props => {
     let box;
 
+    
     function attachDragBehavior(mesh) {
         const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
         pointerDragBehavior.onDragStartObservable.add((event) => {
@@ -27,19 +28,29 @@ const SceneContainer = props => {
         // console.log(SceneLoader.IsPluginForExtensionAvailable('.obj'));
         SceneLoader.ImportMesh('', 'models/', 'loungeChair.obj', scene, (meshes) => {
             meshes.forEach( (mesh) => {
-                mesh.position = new Vector3(1, 0, 2);
+                // mesh.position = new Vector3(1, 0, 2);
                 mesh.scaling = new Vector3(2, 2, 2);
             })
-            console.log(meshes);
+            const newMesh = Mesh.MergeMeshes(meshes);
+            attachDragBehavior(newMesh);
         })
 
         SceneLoader.ImportMesh('', 'models/', 'bathtub.obj', scene, (meshes) => {
             meshes.forEach( (mesh) => {
-                mesh.position = new Vector3(-2, 0, -2);
-                console.log(mesh.position);
+                // mesh.position = new Vector3(-2, 0, -2);
                 mesh.scaling = new Vector3(2, 2, 2);
             })
-            console.log(meshes);
+            const newMesh = Mesh.MergeMeshes(meshes);
+            attachDragBehavior(newMesh);
+        })
+
+        SceneLoader.ImportMesh('', 'models/', 'bear.obj', scene, (meshes) => {
+            meshes.forEach( (mesh) => {
+                // mesh.position = new Vector3(-2, 0, -2);
+                mesh.scaling = new Vector3(2, 2, 2);
+            })
+            const newMesh = Mesh.MergeMeshes(meshes);
+            attachDragBehavior(newMesh);
         })
 
         // SceneLoader.ImportMesh('', 'models/', 'floorFull.obj', scene, (meshes) => {
@@ -78,7 +89,7 @@ const SceneContainer = props => {
         woodMaterial.specularColor = new Color3.Black();
         box = MeshBuilder.CreateBox('box', { size: 2 }, scene);
         box.position.y = 3;
-        box.scaling = new Vector3(0.6, 0.3, 0.8);
+        // box.scaling = new Vector3(0.6, 0.3, 0.8);
 
         const sphere = MeshBuilder.CreateSphere('sphere', { size: 2 }, scene);
 
@@ -118,15 +129,31 @@ const SceneContainer = props => {
         ground.material = multiMaterial;
         ground.isPickable = false;
 
-        
-
         createModels(scene);
         // scene.debugLayer.show();
 
         window.addEventListener('pointerdown', function() {
             const pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
-            if (pickResult) console.log(pickResult.pickedMesh.id);
+            if (pickResult) {
+                window.addEventListener('keydown', function(key) {
+                    if (key.code === 'KeyR') {
+                        console.log(key);
+                        console.log(pickResult.pickedMesh.rotation);
+                        pickResult.pickedMesh.rotation.y += 0.5;
+                    }
+                });
+                // console.log(pickResult.pickedMesh.id);
+            }
+        })
+
+        // serialize scene
+        window.addEventListener('keydown', function(key) {
+            if (key.code === 'KeyT') {
+                const serializedScene = SceneSerializer.Serialize(scene);
+                const strScene = JSON.stringify(serializedScene);
+                console.log(strScene);
+            }
         })
     }
 
