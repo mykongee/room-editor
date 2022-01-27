@@ -27,7 +27,8 @@ const SceneComponent = props => {
              { method: 'GET' }
             );
             const res = await response.text();
-            console.log(res);            
+            console.log(res);
+            console.log('fetched');            
         } catch (err) {
             console.log(err);
         }
@@ -112,12 +113,13 @@ const SceneComponent = props => {
         if (saveButton.current) {
             console.log('savebutton useeffect');
         };
-        saveButton.current.addEventListener('pointerdown', postData);
-        // saveButton.current.addEventListener('pointerdown', serialize);
-        // add event listener to ping backend
-
+        // saveButton.current.addEventListener('pointerdown', postData);
+        // return () => {
+        //     saveButton.current.removeEventListener('pointerdown', postData);
+        // }
+        saveButton.current.addEventListener('pointerdown', fetchData);
         return () => {
-            saveButton.current.removeEventListener('pointerdown', postData);
+            saveButton.current.removeEventListener('pointerdown', fetchData);
         }
     }, [saveButton]);
 
