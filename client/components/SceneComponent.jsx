@@ -1,5 +1,5 @@
 import React from 'react';
-import { Engine, EngineStore, Scene, SceneLoader, SceneSerializer, PointerDragBehavior } from "@babylonjs/core";
+import { Engine, EngineStore, Scene, Mesh, SceneLoader, SceneSerializer, PointerDragBehavior, Vector3 } from "@babylonjs/core";
 import { useEffect, useRef, useState, useCallback } from "react";
 import Picker from './Picker.jsx';
 
@@ -8,35 +8,13 @@ const SceneComponent = props => {
     const saveButton = useRef(null);
     const { antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady, ...rest } = props;   
     // const [scene, setScene] = useState(undefined);
+    const [children, setChildren] = useState(null);
+    const [submitButton, setSubmitButton] = useState(null);
     let scene;
-    console.log('reactcanvas', reactCanvas);
-    
-    // useCallback( (call, scene) => {
-    //     console.log('is fetching')
-    //     fetch('http://localhost:3000/api', {
-    //         method: "GET",
-    //     })
-    //     .then(res => res.json())
-    //     .catch(err => console.log(err))
-    // }, [isFetching])
-
-    // for POST body, serialize scene
-    const fetchData = async () => {
-        console.log('is fetching');
-        try {
-            const response = await fetch('http://localhost:3000/api',
-             { method: 'GET' }
-            );
-            const res = await response.text();
-            console.log(res);
-            console.log('fetched');            
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     function attachDragBehavior(mesh) {
         const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        console.log('pointerdragbehavior', pointerDragBehavior);
         pointerDragBehavior.onDragStartObservable.add((event) => {
             console.log('dragStart', event);
         })
@@ -64,13 +42,34 @@ const SceneComponent = props => {
     }
 
     function save(scene) {
+        console.log('in save');
+        console.log(scene);
         const serializedScene = SceneSerializer.Serialize(scene);
         const strScene = JSON.stringify(serializedScene);
         // console.log(strScene);
         return strScene;
     }
+    
+    // for POST body, serialize scene
+    const fetchData = async () => {
+        // event.preventDefault();
+        // console.log(event);
+        console.log('is fetching');
+        try {
+            const response = await fetch('http://localhost:3000/api',
+             { method: 'GET' }
+            );
+            const res = await response.text();
+            console.log(res);
+            console.log('fetched');            
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const postData = async () => {
+        // event.preventDefault();
+        // console.log(event);
         console.log('is posting');
         try {
             const serializedData = save(scene);
@@ -97,7 +96,11 @@ const SceneComponent = props => {
             const engine = new Engine(reactCanvas.current, antialias, engineOptions, adaptToDeviceRatio);
             scene = new Scene(engine, sceneOptions);
             // const x = new Scene(engine, sceneOptions);
+            const children = <Picker createModel={createModel} scene={scene}/>;
+            setChildren(children);
 
+            // const submitButton = <button type="submit" scene={scene}>Save and submit</button>
+            // setSubmitButton(submitButton);
             // ready scene
             if (scene.isReady()) {
                 props.onSceneReady(scene);
@@ -134,34 +137,33 @@ const SceneComponent = props => {
         }
     }, [reactCanvas]); //end useEffect hook
 
-    const serialize = () => {
-        const serializedScene = SceneSerializer.Serialize(scene);
-        const strScene = JSON.stringify(serializedScene);
-        console.log(strScene);
-    }
 
     useEffect( () => {
         if (saveButton.current) {
             console.log('savebutton useeffect');
+            saveButton.current.addEventListener('pointerdown', postData);
         };
-        // saveButton.current.addEventListener('pointerdown', postData);
-        // return () => {
-        //     saveButton.current.removeEventListener('pointerdown', postData);
-        // }
-        saveButton.current.addEventListener('pointerdown', fetchData);
         return () => {
-            saveButton.current.removeEventListener('pointerdown', fetchData);
+            saveButton.current.removeEventListener('pointerdown', postData);
         }
+        // saveButton.current.addEventListener('pointerdown', fetchData);
+        // return () => {
+        //     saveButton.current.removeEventListener('pointerdown', fetchData);
+        // }
     }, [saveButton]);
 
     return (
-        <div>
+        <div className='babylon'>
             <div id="test">
+                {/* <form onSubmit={postData} id='form'> */}
+                {/* <input type="text" id="scene-name" defaultValue="Scene Name" />  */}
+                    {/* {submitButton} */}
                 <button ref={saveButton}>
                     Save Scene and do stuff plz
                 </button>
+                {/* </form> */}
+                {children}
             </div>
-            <Picker createModel={createModel} scene={scene}/>
             <canvas style={ {height: 100+'%' , width: 100+'%'} } ref={reactCanvas} {...rest} />
         </div>
     )

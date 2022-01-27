@@ -110,7 +110,7 @@ const SceneContainer = props => {
                 mesh.rotation = new Vector3(0, 5, 0);
                 mesh.material = woodMaterial;
             });
-            newMesh = Mesh.MergeMeshes(meshes);
+            const newMesh = Mesh.MergeMeshes(meshes);
             // attachDragBehavior(logo);
         })
 
@@ -152,10 +152,8 @@ const SceneContainer = props => {
         box.position.y = 3;
         // box.scaling = new Vector3(0.6, 0.3, 0.8);
 
-        const sphere = MeshBuilder.CreateSphere('sphere', { size: 2 }, scene);
 
         attachDragBehavior(box);
-        attachDragBehavior(sphere);
 
         const groundSize = 15;
         // const ground = MeshBuilder.CreateGround('ground', { width: groundSize, height: groundSize }, scene);

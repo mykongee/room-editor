@@ -15,3 +15,7 @@ body {
 .picker {
     display: flex;
 }
+
+.babylon {
+    width: 90%;
+}

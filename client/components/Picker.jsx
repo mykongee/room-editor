@@ -2,6 +2,7 @@ import React from 'react';
 
 const Picker = props => {
     const { createModel, scene } = props;
+    console.log(createModel);
 
     return (
         <div className="picker">

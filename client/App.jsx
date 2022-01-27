@@ -11,7 +11,7 @@ const App = (props) => {
         <div id="container">
             <InterfaceContainer />
             <SceneContainer />
-            {/* <ViewerComponent /> */}
+            <ViewerComponent />
         </div>
     )
 };

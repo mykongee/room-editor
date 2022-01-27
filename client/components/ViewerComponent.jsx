@@ -5,10 +5,12 @@ import "@babylonjs/viewer";
 
 const ViewerComponent = props => {
     const uri = '../models/bench.obj';
+    const one = '../test2.babylon';
+    const two = '../untitled.obj'
 
     return (
-        <div>
-            <babylon extends='minimal' model='../test2.babylon'></babylon>
+        <div className='babylon'>
+            <babylon extends='minimal' model='../models/untitled.obj'></babylon>
         </div>
     )
 }
