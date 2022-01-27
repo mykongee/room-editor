@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI; 
+const MONGO_URI = 'mongodb+srv://mykongee:codesmith123@firstcluster.un9os.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'; 
 
 mongoose
     .connect(MONGO_URI, {
@@ -14,102 +14,107 @@ mongoose
 const Schema = mongoose.Schema;
 
 const sceneSchema = new Schema( {
+    name: String,
     autoClear: {
-      "type": "Boolean"
+      type: Boolean
     },
     clearColor: {
-      "type": [
-        "Number"
+      type: [
+        Number
       ]
     },
     ambientColor: {
-      "type": [
-        "Number"
+      type: [
+        Number
       ]
     },
     gravity: {
-      "type": [
-        "Number"
+      type: [
+        Number
       ]
     },
     collisionsEnabled: {
-      "type": "Boolean"
+      type: Boolean
     },
     morphTargetManagers: {
-      "type": "Array"
+      type: Array
     },
     lights: {
-      "type": [
-        "Mixed"
+      type: [
+        Schema.Types.Mixed
       ]
     },
     cameras: {
-      "type": [
-        "Mixed"
+      type: [
+        Schema.Types.Mixed
       ]
     },
     activeCameraID: {
-      "type": "String"
+      type: String
     },
     animations: {
-      "type": "Array"
+      type: Array
     },
     materials: {
-      "type": [
-        "Mixed"
+      type: [
+        Schema.Types.Mixed
       ]
     },
     multiMaterials: {
-      "type": [
-        "Mixed"
+      type: [
+        Schema.Types.Mixed
       ]
     },
     environmentIntensity: {
-      "type": "Number"
+      type: Number
     },
     skeletons: {
-      "type": "Array"
+      type: Array
     },
     transformNodes: {
-      "type": "Array"
+      type: Array
     },
     geometries: {
       boxes: {
-        "type": "Array"
+        type: Array
       },
       spheres: {
-        "type": "Array"
+        type: Array
       },
       cylinders: {
-        "type": "Array"
+        type: Array
       },
       toruses: {
-        "type": "Array"
+        type: Array
       },
       grounds: {
-        "type": "Array"
+        type: Array
       },
       planes: {
-        "type": "Array"
+        type: Array
       },
       torusKnots: {
-        "type": "Array"
+        type: Array
       },
       vertexData: {
-        "type": [
-          "Mixed"
+        type: [
+          Schema.Types.Mixed
         ]
       }
     },
     meshes: {
       type: [
-        "Mixed"
-      ]
+        Schema.Types.Mixed
+    ]
     },
     particleSystems: {
-      type: "Array"
+      type: Array
     },
     postProcesses: {
-      "type": "Array"
+      type: Array
     }
 })
+
+const Scene = mongoose.model('scene', sceneSchema, 'scenes');
+
+module.exports = Scene;

@@ -11,3 +11,7 @@ body {
     background-color: rgb(227, 251, 255);
     border: 1px solid red;
 }
+
+.picker {
+    display: flex;
+}

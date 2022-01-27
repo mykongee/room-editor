@@ -1,14 +1,15 @@
 import React from 'react';
-import { Engine, EngineStore, Scene, SceneLoader, SceneSerializer } from "@babylonjs/core";
+import { Engine, EngineStore, Scene, SceneLoader, SceneSerializer, PointerDragBehavior } from "@babylonjs/core";
 import { useEffect, useRef, useState, useCallback } from "react";
+import Picker from './Picker.jsx';
 
 const SceneComponent = props => {
     const reactCanvas = useRef(null);
     const saveButton = useRef(null);
     const { antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady, ...rest } = props;   
-    // let [sceneState, setSceneState] = useState(null); 
-    // const [isFetching, setIsFetching] = useState(false);
+    // const [scene, setScene] = useState(undefined);
     let scene;
+    console.log('reactcanvas', reactCanvas);
     
     // useCallback( (call, scene) => {
     //     console.log('is fetching')
@@ -32,6 +33,34 @@ const SceneComponent = props => {
         } catch (err) {
             console.log(err);
         }
+    }
+
+    function attachDragBehavior(mesh) {
+        const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        pointerDragBehavior.onDragStartObservable.add((event) => {
+            console.log('dragStart', event);
+        })
+        pointerDragBehavior.onDragObservable.add((event) => {
+            // console.log('drag', event);
+        })
+        pointerDragBehavior.onDragEndObservable.add((event) => {
+            console.log('dragEnd', event);
+        })
+
+        mesh.addBehavior(pointerDragBehavior);
+    }
+
+    function createModel(modelFileName, scene) {
+        console.log(`creating: ${modelFileName} in ${scene}`);
+
+        SceneLoader.ImportMesh('', 'models/', modelFileName, scene, (meshes) => {
+            meshes.forEach( (mesh) => {
+                mesh.scaling = new Vector3(2, 2, 2);
+            })
+            const newMesh = Mesh.MergeMeshes(meshes);
+            console.log(newMesh);
+            attachDragBehavior(newMesh);
+        })
     }
 
     function save(scene) {
@@ -67,6 +96,8 @@ const SceneComponent = props => {
         if (reactCanvas.current) {
             const engine = new Engine(reactCanvas.current, antialias, engineOptions, adaptToDeviceRatio);
             scene = new Scene(engine, sceneOptions);
+            // const x = new Scene(engine, sceneOptions);
+
             // ready scene
             if (scene.isReady()) {
                 props.onSceneReady(scene);
@@ -130,6 +161,7 @@ const SceneComponent = props => {
                     Save Scene and do stuff plz
                 </button>
             </div>
+            <Picker createModel={createModel} scene={scene}/>
             <canvas style={ {height: 100+'%' , width: 100+'%'} } ref={reactCanvas} {...rest} />
         </div>
     )

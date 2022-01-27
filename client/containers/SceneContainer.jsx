@@ -1,6 +1,7 @@
 import React from 'react';
 import { FreeCamera, SubMesh, MultiMaterial, Texture, SceneLoader, TargetCamera, Vector3, HemisphericLight, StandardMaterial, MeshBuilder, Camera, CameraInputTypes, UniversalCamera, Color3, PointerDragBehavior, Mesh, SceneSerializer } from '@babylonjs/core';
 import SceneComponent from '../components/SceneComponent.jsx';
+import Picker from '../components/Picker.jsx';
 import 'babylonjs';
 import '@babylonjs/loaders/OBJ';
 
@@ -8,6 +9,7 @@ const SceneContainer = props => {
     let box;
     let logo;
     
+    // attaches pointerdragbehavior to mesh
     function attachDragBehavior(mesh) {
         const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
         pointerDragBehavior.onDragStartObservable.add((event) => {
@@ -23,6 +25,32 @@ const SceneContainer = props => {
         mesh.addBehavior(pointerDragBehavior);
     }
 
+    let objectUrl;
+    function download(fileName, scene) {
+        if (objectUrl) {
+            window.URL.revokeObjectURL(objectUrl);
+        }
+
+        const serializedScene = SceneSerializer.Serialize(scene);
+        const strScene = JSON.stringify(serializedScene);
+
+        if (fileName.toLowerCase().lastIndexOf('.babylon') !== fileName.length - 8 || fileName.length < 9) {
+            fileName += '.babylon';
+        }
+
+        const blob = new Blob( [strScene], { type: 'octet/stream' });
+
+        objectUrl = (window.webkitURL || window.URL).createObjectURL(blob);
+
+        let link = window.document.createElement('a');
+        link.href = objectUrl;
+        link.download = fileName;
+        let click = document.createEvent('MouseEvents');
+        click.initEvent('click', true, false);
+        link.dispatchEvent(click);
+    }
+
+    // import multiple models into scene
     function createModels(scene) {
         console.log('creating models');
         // console.log(SceneLoader.IsPluginForExtensionAvailable('.obj'));
@@ -177,7 +205,6 @@ const SceneContainer = props => {
                         pickResult.pickedMesh.rotation.y += 0.5;
                     }
                 });
-                // console.log(pickResult.pickedMesh.id);
             }
 
             // scene.getEngine().stopRenderLoop();
@@ -185,15 +212,17 @@ const SceneContainer = props => {
 
         // serialize scene
         window.addEventListener('keydown', function(key) {
-            if (key.code === 'KeyT') {
-                const serializedScene = SceneSerializer.Serialize(scene);
-                const strScene = JSON.stringify(serializedScene);
+            if (key.code === 'KeyD') {                
+                if (confirm('download?')) {
+                    download('scene', scene);
+                } else {
+                    console.log('no download');
+                }
             }
         })
     }
 
     function onRender(scene) {
-        // console.log('onRender');
         // if (logo) {
         //     let deltaTime = scene.getEngine().getDeltaTime();
 
@@ -201,13 +230,6 @@ const SceneContainer = props => {
         //     logo.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTime / 100);
         // }
     }
-
-    // function save(scene) {
-        // const serializedScene = SceneSerializer.Serialize(scene);
-        // const strScene = JSON.stringify(serializedScene);
-        // console.log(strScene);
-        // console.log(scene);
-    // }
 
     return (
         <div>
