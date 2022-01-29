@@ -5,6 +5,16 @@ body {
     flex-direction: column;
 }
 
+.intro {
+    height: 60rem;
+    width: 100%;
+    background-color: rgb(176, 229, 246);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .interfaceContainer {
     width: 100%;
     height: 15rem;
@@ -14,6 +24,10 @@ body {
 
 .picker {
     display: flex;
+}
+
+.img-picker {
+    margin-right: 10px;
 }
 
 .babylon {

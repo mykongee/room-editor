@@ -1,5 +1,5 @@
-import React from 'react';
-import { FreeCamera, SubMesh, MultiMaterial, Texture, SceneLoader, TargetCamera, Vector3, HemisphericLight, StandardMaterial, MeshBuilder, Camera, CameraInputTypes, UniversalCamera, Color3, PointerDragBehavior, Mesh, SceneSerializer } from '@babylonjs/core';
+import React, {useState} from 'react';
+import { FreeCamera, SceneLoader, TargetCamera, Vector3, HemisphericLight, StandardMaterial, MeshBuilder, Camera, DirectionalLight, UniversalCamera, Color3, PointerDragBehavior, Tools, Texture, Mesh, PointLight, SceneSerializer } from '@babylonjs/core';
 import SceneComponent from '../components/SceneComponent.jsx';
 import Picker from '../components/Picker.jsx';
 import 'babylonjs';
@@ -8,10 +8,13 @@ import '@babylonjs/loaders/OBJ';
 const SceneContainer = props => {
     let box;
     let logo;
-    
+    const standardScale = new Vector3(4, 4, 4);
+    const [camera, setCamera] = useState(null);
+
     // attaches pointerdragbehavior to mesh
     function attachDragBehavior(mesh) {
-        const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        // const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        const pointerDragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0)});
         pointerDragBehavior.onDragStartObservable.add((event) => {
             console.log('dragStart', event);
         })
@@ -54,50 +57,94 @@ const SceneContainer = props => {
     function createModels(scene) {
         console.log('creating models');
         // console.log(SceneLoader.IsPluginForExtensionAvailable('.obj'));
-        SceneLoader.ImportMesh('', 'models/', 'loungeChair.obj', scene, (meshes) => {
+
+        // FLOOR AND WALLS
+        SceneLoader.ImportMesh('', 'models/', 'floorFull.obj', scene, (meshes) => {
             meshes.forEach( (mesh) => {
-                // mesh.position = new Vector3(1, 0, 2);
-                mesh.scaling = new Vector3(2, 2, 2);
+                mesh.scaling = new Vector3(15, 6, 15);
+                mesh.position = new Vector3(5, -1, -10);
             })
             const newMesh = Mesh.MergeMeshes(meshes);
-            attachDragBehavior(newMesh);
+            newMesh.isPickable = false;
         })
 
-        SceneLoader.ImportMesh('', 'models/', 'bathtub.obj', scene, (meshes) => {
+        SceneLoader.ImportMesh('', 'models/', 'wall.obj', scene, (meshes) => {
+            const mat = new StandardMaterial('mat', scene);
+            mat.diffuseColor = new Color3(0.25, 0.5, 0.7);
+            // mat.specularColor = new Color3(1, 0.5, 0.2);
             meshes.forEach( (mesh) => {
-                // mesh.position = new Vector3(-2, 0, -2);
-                mesh.scaling = new Vector3(2, 2, 2);
+                mesh.position = new Vector3(5, -1, 5);
+                mesh.scaling = new Vector3(15, 5, 5);
+                mesh.material = mat;
             })
             const newMesh = Mesh.MergeMeshes(meshes);
-            attachDragBehavior(newMesh);
+            newMesh.isPickable = false;
         })
 
-        SceneLoader.ImportMesh('', 'models/', 'bear.obj', scene, (meshes) => {
+        SceneLoader.ImportMesh('', 'models/', 'wall.obj', scene, (meshes) => {
+            const mat = new StandardMaterial('mat', scene);
+            mat.diffuseColor = new Color3(0.3, 0.2, 0.8);
+            // mat.specularColor = new Color3(1, 0.5, 0.2);
             meshes.forEach( (mesh) => {
-                // mesh.position = new Vector3(-2, 0, -2);
-                mesh.scaling = new Vector3(2, 2, 2);
+                mesh.position = new Vector3(-10, -1, 5);
+                // mesh.rotation = new Vector3(0, 5, 5);
+                mesh.rotation.y = 4.7;
+                mesh.scaling = new Vector3(15, 5, 5);
+                mesh.material = mat;
             })
             const newMesh = Mesh.MergeMeshes(meshes);
-            attachDragBehavior(newMesh);
+            newMesh.isPickable = false;
         })
 
-        SceneLoader.ImportMesh('', 'models/', 'loungeDesignChair.obj', scene, (meshes) => {
-            meshes.forEach( (mesh) => {
-                mesh.position = new Vector3(-2, 2, 0);
-                mesh.scaling = new Vector3(2, 2, 2);
-            })
-            const newMesh = Mesh.MergeMeshes(meshes);
-            attachDragBehavior(newMesh);
-        })
+        // END FLOOR AND WALLS 
 
-        SceneLoader.ImportMesh('', 'models/', 'tableGlass.obj', scene, (meshes) => {
-            meshes.forEach( (mesh) => {
-                mesh.position = new Vector3(-2, 0, -2);
-                mesh.scaling = new Vector3(2, 2, 2);
-            })
-            const newMesh = Mesh.MergeMeshes(meshes);
-            attachDragBehavior(newMesh);
-        })
+        // SceneLoader.ImportMesh('', 'models/', 'loungeChair.obj', scene, (meshes) => {
+        //     meshes.forEach( (mesh) => {
+        //         // mesh.position = new Vector3(1, 0, 2);
+        //         mesh.scaling = standardScale;
+        //         // shadowGenerator.addShadowCaster(mesh);
+        //         // mesh.receiveShadows = true;
+
+        //     })
+        //     const newMesh = Mesh.MergeMeshes(meshes);
+        //     attachDragBehavior(newMesh);
+        // })
+
+        // SceneLoader.ImportMesh('', 'models/', 'bathtub.obj', scene, (meshes) => {
+        //     meshes.forEach( (mesh) => {
+        //         // mesh.position = new Vector3(-2, 0, -2);
+        //         mesh.scaling = standardScale;
+        //     })
+        //     const newMesh = Mesh.MergeMeshes(meshes);
+        //     attachDragBehavior(newMesh);
+        // })
+
+        // SceneLoader.ImportMesh('', 'models/', 'bear.obj', scene, (meshes) => {
+        //     meshes.forEach( (mesh) => {
+        //         // mesh.position = new Vector3(-2, 0, -2);
+        //         mesh.scaling = standardScale;
+        //     })
+        //     const newMesh = Mesh.MergeMeshes(meshes);
+        //     attachDragBehavior(newMesh);
+        // })
+
+        // SceneLoader.ImportMesh('', 'models/', 'loungeDesignChair.obj', scene, (meshes) => {
+        //     meshes.forEach( (mesh) => {
+        //         mesh.position = new Vector3(-2, 0, 0);
+        //         mesh.scaling = standardScale;
+        //     })
+        //     const newMesh = Mesh.MergeMeshes(meshes);
+        //     attachDragBehavior(newMesh);
+        // })
+
+        // SceneLoader.ImportMesh('', 'models/', 'tableGlass.obj', scene, (meshes) => {
+        //     meshes.forEach( (mesh) => {
+        //         mesh.position = new Vector3(-2, 0, -2);
+        //         mesh.scaling = standardScale;
+        //     })
+        //     const newMesh = Mesh.MergeMeshes(meshes);
+        //     attachDragBehavior(newMesh);
+        // })
 
         SceneLoader.ImportMesh('', 'models/', 'codesmith-logo.obj', scene, (meshes) => {
             const woodMaterial = new StandardMaterial('woodMaterial', scene);
@@ -105,24 +152,14 @@ const SceneContainer = props => {
             woodMaterial.diffuseColor = new Color3(0.08, 0.20, 0.5);
             // woodMaterial.specularColor = new Color3.Black();
             meshes.forEach( (mesh) => {
-                mesh.position = new Vector3(5, 2, 3);
+                mesh.position = new Vector3(9, 2, 7);
                 mesh.scaling = new Vector3(0.2, 0.2, 0.2);
-                mesh.rotation = new Vector3(0, 5, 0);
+                mesh.rotation = new Vector3(0, 15, 0);
                 mesh.material = woodMaterial;
             });
             const newMesh = Mesh.MergeMeshes(meshes);
             // attachDragBehavior(logo);
         })
-
-        // SceneLoader.ImportMesh('', 'models/', 'floorFull.obj', scene, (meshes) => {
-        //     console.log('ImportMesh callback');
-        //     meshes.forEach( (mesh) => {
-        //         mesh.position = new Vector3(-2, 0, -2);
-        //         console.log(mesh.position);
-        //         mesh.scaling = new Vector3(2, 2, 2);
-        //     })
-        //     console.log(meshes);
-        // })
     }
 
     function onSceneReady(scene) {
@@ -130,30 +167,41 @@ const SceneContainer = props => {
         // camera.setTarget(Vector3.Zero());
         console.log('Scene Ready');
         // const camera = new TargetCamera('camera1', new Vector3(5, 5, -5), scene);
-        const camera = new UniversalCamera('camera1', new Vector3(10, 10, -10), scene);
-        // camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+        // const camera = new UniversalCamera('camera1', new Vector3(10, 10, -10), scene);
+        const camera = new UniversalCamera('camera1', new Vector3(15, 15, -15), scene);
         camera.mode = Camera.PERSPECTIVE_CAMERA;
-        // camera.orthoTop = 5;
-        // camera.orthoBottom = -5;
-        // camera.orthoLeft = -5;
-        // camera.orthoRight = 5;
+        camera.fov = 1;
+        camera.attachControl(canvas, true);
+        camera.setTarget(new Vector3(-2, 1, 2));
+        setCamera(camera);
+
+        // camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+        // camera.orthoTop = 15;
+        // camera.orthoBottom = -15;
+        // camera.orthoLeft = -15;
+        // camera.orthoRight = 15;
+        // camera.fov = 2;
 
         const canvas = scene.getEngine().getRenderingCanvas();
-        // camera.attachControl(canvas, true);
-        camera.setTarget(Vector3.Zero());
 
-        const light = new HemisphericLight('light', new Vector3(0, 5, 2), scene);
-        light.intensity = 0.8;
+        const light = new HemisphericLight('light', new Vector3(-2, 5, 2), scene);
+        light.intensity = 1;
+
+        // const light2 = new PointLight('light', new Vector3(-9, 5, -5), scene);
+        // light2.intensity = 0.2;
+        // const shadowGenerator = new ShadowGenerator(512, light2);
+
+        // console.log(shadowGenerator);
 
         // const woodMaterial = new StandardMaterial('woodMaterial', scene);
         // woodMaterial.diffuseTexture = new Texture('./wood_grain.jpg', scene);
         // woodMaterial.specularColor = new Color3.Black();
-        box = MeshBuilder.CreateBox('box', { size: 2 }, scene);
-        box.position.y = 3;
-        // box.scaling = new Vector3(0.6, 0.3, 0.8);
+        // box = MeshBuilder.CreateBox('box', { size: 2 }, scene);
+        // box.position.y = 3;
+        // // box.scaling = new Vector3(0.6, 0.3, 0.8);
 
 
-        attachDragBehavior(box);
+        // attachDragBehavior(box);
 
         const groundSize = 15;
         // const ground = MeshBuilder.CreateGround('ground', { width: groundSize, height: groundSize }, scene);
@@ -165,31 +213,35 @@ const SceneContainer = props => {
         // set multimaterial as material for tiledground
         // set submeshes property of tiledground to an empty array
         // create and set values for these variables
-        const tile = {
-            w: 8,
-            h: 8,
-        }
-        const ground = MeshBuilder.CreateTiledGround('ground', {xmin: -5, zmin: -5, xmax: 5, zmax: 5, subdivisions: tile}, scene);
+        ///// UNCOMMENT
+        // const tile = {
+        //     w: 8,
+        //     h: 8,
+        // }
+        // const ground = MeshBuilder.CreateTiledGround('ground', {xmin: -5, zmin: -5, xmax: 5, zmax: 5, subdivisions: tile}, scene);
         
-        const verticesCount = ground.getTotalVertices();
-        const tileIndicesLength = ground.getIndices().length / (tile.w * tile.h);
-        let base = 0; 
-        for (let row = 0; row < tile.h; row++) {
-            for (let col = 0; col < tile.w; col++) {
-                new SubMesh(row % 2 ^ col % 2, 0, verticesCount, base, tileIndicesLength, ground);
-                base += tileIndicesLength;
-            }
-        }
-        const tileMaterial1 = new StandardMaterial('white', scene);
-        tileMaterial1.diffuseColor = new Color3(0.5, 0.1, 0.3)
-        const tileMaterial2 = new StandardMaterial('black', scene);
-        const multiMaterial = new MultiMaterial('multi', scene);
-        multiMaterial.subMaterials.push(tileMaterial1);
-        multiMaterial.subMaterials.push(tileMaterial2);
-        ground.material = multiMaterial;
-        ground.isPickable = false;
+        // const verticesCount = ground.getTotalVertices();
+        // const tileIndicesLength = ground.getIndices().length / (tile.w * tile.h);
+        // let base = 0; 
+        // for (let row = 0; row < tile.h; row++) {
+        //     for (let col = 0; col < tile.w; col++) {
+        //         new SubMesh(row % 2 ^ col % 2, 0, verticesCount, base, tileIndicesLength, ground);
+        //         base += tileIndicesLength;
+        //     }
+        // }
+        // const tileMaterial1 = new StandardMaterial('white', scene);
+        // tileMaterial1.diffuseColor = new Color3(0.5, 0.1, 0.3)
+        // const tileMaterial2 = new StandardMaterial('black', scene);
+        // const multiMaterial = new MultiMaterial('multi', scene);
+        // multiMaterial.subMaterials.push(tileMaterial1);
+        // multiMaterial.subMaterials.push(tileMaterial2);
+        // ground.material = multiMaterial;
+        // ground.isPickable = false;
+        ///// UNCOMMENT GROUND
 
         createModels(scene);
+        // createSkybox(scene);
+        
         // scene.debugLayer.show();
 
         window.addEventListener('pointerdown', function() {
@@ -198,7 +250,6 @@ const SceneContainer = props => {
             if (pickResult) {
                 window.addEventListener('keydown', function(key) {
                     if (key.code === 'KeyR') {
-                        console.log(key);
                         console.log(pickResult.pickedMesh.rotation);
                         pickResult.pickedMesh.rotation.y += 0.5;
                     }
@@ -231,7 +282,7 @@ const SceneContainer = props => {
 
     return (
         <div>
-            <SceneComponent antialias={true} onSceneReady={onSceneReady} onRender={onRender} id="react-canvas" />
+            <SceneComponent camera={camera} antialias={true} onSceneReady={onSceneReady} onRender={onRender} id="react-canvas" />
         </div>
     )
 }

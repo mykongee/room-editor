@@ -1,19 +1,27 @@
 import React from 'react';
-import { Engine, EngineStore, Scene, Mesh, SceneLoader, SceneSerializer, PointerDragBehavior, Vector3 } from "@babylonjs/core";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Engine, Scene, Mesh, SceneLoader, SceneSerializer, Tools, Camera, UniversalCamera, Texture, PointerDragBehavior, CubeTexture, Vector3 } from "@babylonjs/core";
+import { useEffect, useRef, useState } from "react";
 import Picker from './Picker.jsx';
 
 const SceneComponent = props => {
+    const { antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady } = props;   
     const reactCanvas = useRef(null);
+    console.log('first', props.camera);
     const saveButton = useRef(null);
-    const { antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady, ...rest } = props;   
-    // const [scene, setScene] = useState(undefined);
+    const [cam, setCam] = useState(null);
+    const pngButton = useRef(null);
+    const [img, setImage] = useState(null);
+    const [png, setPng] = useState(null);
     const [children, setChildren] = useState(null);
-    const [submitButton, setSubmitButton] = useState(null);
     let scene;
+    let engine;
+    
+    const standardScale = new Vector3(4, 4, 4);
 
     function attachDragBehavior(mesh) {
-        const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        // const pointerDragBehavior = new PointerDragBehavior({ dragAxis: new Vector3(1, 0, 0)});
+        const pointerDragBehavior = new PointerDragBehavior({dragPlaneNormal: new Vector3(0, 1, 0)});
+
         console.log('pointerdragbehavior', pointerDragBehavior);
         pointerDragBehavior.onDragStartObservable.add((event) => {
             console.log('dragStart', event);
@@ -33,10 +41,9 @@ const SceneComponent = props => {
 
         SceneLoader.ImportMesh('', 'models/', modelFileName, scene, (meshes) => {
             meshes.forEach( (mesh) => {
-                mesh.scaling = new Vector3(2, 2, 2);
+                mesh.scaling = standardScale;
             })
             const newMesh = Mesh.MergeMeshes(meshes);
-            console.log(newMesh);
             attachDragBehavior(newMesh);
         })
     }
@@ -50,6 +57,14 @@ const SceneComponent = props => {
         return strScene;
     }
     
+    function exportToPng() {
+        const x = Tools.CreateScreenshot(engine, cam, {precision: 2, width: 1920, height: 1080}, (string) => {
+            console.log(string);
+        });
+        Tools.CreateScreenshot(engine, cam, {precision: 2, width: 1920, height: 1080});
+        // console.log(x);
+    }
+
     // for POST body, serialize scene
     const fetchData = async () => {
         // event.preventDefault();
@@ -92,20 +107,27 @@ const SceneComponent = props => {
     }
 
     useEffect( ()=> {
+        console.log('reactcanvas init')
         if (reactCanvas.current) {
-            const engine = new Engine(reactCanvas.current, antialias, engineOptions, adaptToDeviceRatio);
+            // const engine = new Engine(reactCanvas.current, antialias, {preserveDrawingBuffer: true, stencil: true}, adaptToDeviceRatio);
+            engine = new Engine(reactCanvas.current, antialias, {preserveDrawingBuffer: true, stencil: true}, adaptToDeviceRatio);
             scene = new Scene(engine, sceneOptions);
-            // const x = new Scene(engine, sceneOptions);
             const children = <Picker createModel={createModel} scene={scene}/>;
             setChildren(children);
+            
+            const png = <button engine={engine} scene={scene} onClick={exportToPng}>Export to PNG</button>
+            setPng(png);
 
-            // const submitButton = <button type="submit" scene={scene}>Save and submit</button>
-            // setSubmitButton(submitButton);
             // ready scene
             if (scene.isReady()) {
-                props.onSceneReady(scene);
+                onSceneReady(scene);
+                const camera = new UniversalCamera('camera2', new Vector3(15, 15, -15), scene);
+                camera.mode = Camera.PERSPECTIVE_CAMERA;
+                camera.fov = 1;
+                camera.setTarget(new Vector3(-2, 1, 2));
+                setCam(camera);
             } else {
-                scene.onReadyObservable.addOnce((scene) => props.onSceneReady(scene));
+                scene.onReadyObservable.addOnce((scene) => onSceneReady(scene));
             }
 
             // render scene in render loop
@@ -139,18 +161,27 @@ const SceneComponent = props => {
 
 
     useEffect( () => {
+        console.log('savebutton changed');
         if (saveButton.current) {
             console.log('savebutton useeffect');
             saveButton.current.addEventListener('pointerdown', postData);
         };
+
+        if (pngButton.current) {
+            console.log('pngbutton useeffect');
+            pngButton.current.addEventListener('pointerdown', exportToPng)
+        }
+
         return () => {
             saveButton.current.removeEventListener('pointerdown', postData);
+            pngButton.current.removeEventListener('pointerdown', exportToPng)
+
         }
         // saveButton.current.addEventListener('pointerdown', fetchData);
         // return () => {
         //     saveButton.current.removeEventListener('pointerdown', fetchData);
         // }
-    }, [saveButton]);
+    }, [saveButton, pngButton]);
 
     return (
         <div className='babylon'>
@@ -161,10 +192,14 @@ const SceneComponent = props => {
                 <button ref={saveButton}>
                     Save Scene and do stuff plz
                 </button>
+                <button ref={pngButton}>
+                    Export to PNG
+                </button>
+                {/* {png} */}
                 {/* </form> */}
                 {children}
             </div>
-            <canvas style={ {height: 100+'%' , width: 100+'%'} } ref={reactCanvas} {...rest} />
+            <canvas style={ {height: 100+'%' , width: 100+'%'} } ref={reactCanvas} />
         </div>
     )
 }
