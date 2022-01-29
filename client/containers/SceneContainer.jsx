@@ -272,12 +272,6 @@ const SceneContainer = props => {
     }
 
     function onRender(scene) {
-        // if (logo) {
-        //     let deltaTime = scene.getEngine().getDeltaTime();
-
-        //     const rpm = 2;
-        //     logo.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTime / 100);
-        // }
     }
 
     return (
