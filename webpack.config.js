@@ -50,7 +50,7 @@ module.exports = {
                 }
             },
             {
-                test: /\.(png|mtl|jpe?g|bin|obj|glb|gltf)$/,
+                test: /\.(png|mtl|jpg|jpe?g|bin|obj|glb|gltf)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'file-loader',
