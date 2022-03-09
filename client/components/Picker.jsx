@@ -6,6 +6,13 @@ const Picker = props => {
     const standardScale = new Vector3(4, 4, 4);
     console.log(createModel);
 
+    const divFactory = (fileName) => {
+        return ( // programatically use file name to construct div
+        <div>
+            
+        </div>
+        )
+    }
 
     // const pickableImages = [];
     return (
