@@ -4,12 +4,20 @@ import { Vector3 } from '@babylonjs/core';
 const Picker = props => {
     const { createModel, scene } = props;
     const standardScale = new Vector3(4, 4, 4);
+    const [models, setModels] = useState([]);
     console.log(createModel);
 
+
+    /**
+     * 
+     * @param {string} fileName 
+     *                 'cabinetBed.obj'
+     * @returns {JSX}
+     */
     const divFactory = (fileName) => {
         return ( // programatically use file name to construct div
-        <div>
-            
+        <div onClick={() => createModel(fileName, scene)} className="img-picker">
+            <img id={fileName} src={`../assets/images/${fileName}_SE.png`} />            
         </div>
         )
     }
