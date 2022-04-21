@@ -164,7 +164,8 @@ const SceneComponent = props => {
         console.log('savebutton changed');
         if (saveButton.current) {
             console.log('savebutton useeffect');
-            saveButton.current.addEventListener('pointerdown', postData);
+            // TODO
+            // saveButton.current.addEventListener('pointerdown', postData);
         };
 
         if (pngButton.current) {
@@ -190,7 +191,7 @@ const SceneComponent = props => {
                 {/* <input type="text" id="scene-name" defaultValue="Scene Name" />  */}
                     {/* {submitButton} */}
                 <button ref={saveButton}>
-                    Save Scene and do stuff plz
+                    Save Scene (to be implemented)
                 </button>
                 <button ref={pngButton}>
                     Export to PNG

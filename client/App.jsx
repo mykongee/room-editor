@@ -10,10 +10,10 @@ const App = (props) => {
     return (
         <div id="container">
             {/* <InterfaceContainer /> */}
-            <div className="intro">
+            {/* <div className="intro">
                 <h1>roomSim</h1>
                 <h3>Free Assets From @KenneyNL License: (CC0 1.0 Universal)</h3>
-            </div>
+            </div> */}
             <SceneContainer />
             <ViewerComponent />
         </div>
